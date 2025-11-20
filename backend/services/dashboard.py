@@ -7,7 +7,7 @@ class DashboardService:
     async def get_overview_stats() -> dict[str, int]:
         """Get overall counts for dashboard"""
         query = """
-            SELECT 
+            SELECT
                 (SELECT COUNT(*) FROM projects) as total_projects,
                 (SELECT COUNT(*) FROM technologies) as total_technologies,
                 (SELECT COUNT(*) FROM teams) as total_teams,
@@ -20,7 +20,7 @@ class DashboardService:
     async def get_technology_usage() -> list[dict[str, Any]]:
         """Get most used technologies across projects"""
         query = """
-            SELECT 
+            SELECT
                 t.name,
                 COUNT(DISTINCT pt.project_id) as project_count,
                 tc.name as category_name
@@ -38,7 +38,7 @@ class DashboardService:
     async def get_project_status_distribution() -> list[dict[str, Any]]:
         """Get project count by status"""
         query = """
-            SELECT 
+            SELECT
                 status,
                 COUNT(*) as count
             FROM projects
@@ -52,7 +52,7 @@ class DashboardService:
     async def get_recent_projects() -> list[dict[str, Any]]:
         """Get 5 most recent projects with team info"""
         query = """
-            SELECT 
+            SELECT
                 p.id,
                 p.name,
                 p.status,
@@ -71,7 +71,7 @@ class DashboardService:
     async def get_team_summary() -> list[dict[str, Any]]:
         """Get team statistics"""
         query = """
-            SELECT 
+            SELECT
                 t.id,
                 t.name,
                 COUNT(DISTINCT p.id) as project_count,
@@ -90,7 +90,7 @@ class DashboardService:
     async def get_technology_by_category() -> list[dict[str, Any]]:
         """Get technology count by category"""
         query = """
-            SELECT 
+            SELECT
                 tc.name as category,
                 COUNT(t.id) as count
             FROM technology_categories tc

@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Request, status
+from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
 
@@ -40,18 +40,18 @@ class ConflictException(APIException):
 async def api_exception_handler(request: Request, exc: APIException) -> JSONResponse:
     """
     Handle API exceptions
-    
+
     Args:
         request: Request object
         exc: Exception instance
-        
+
     Returns:
         JSON error response
     """
     content = {"message": exc.message}
     if isinstance(exc, ValidationException) and exc.errors:
         content["errors"] = exc.errors
-    
+
     return JSONResponse(
         status_code=exc.status_code,
         content=content,
@@ -61,11 +61,11 @@ async def api_exception_handler(request: Request, exc: APIException) -> JSONResp
 async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """
     Handle general exceptions
-    
+
     Args:
         request: Request object
         exc: Exception instance
-        
+
     Returns:
         JSON error response
     """
@@ -73,4 +73,3 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"message": f"Internal server error: {str(exc)}"},
     )
-

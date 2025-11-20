@@ -16,11 +16,11 @@ security = HTTPBearer()
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Verify password against hash
-    
+
     Args:
         plain_password: Plain text password
         hashed_password: Hashed password
-        
+
     Returns:
         True if password matches
     """
@@ -30,10 +30,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     """
     Hash password
-    
+
     Args:
         password: Plain text password
-        
+
     Returns:
         Hashed password
     """
@@ -43,10 +43,10 @@ def get_password_hash(password: str) -> str:
 def create_access_token(data: dict[str, Any]) -> str:
     """
     Create JWT access token
-    
+
     Args:
         data: Data to encode in token
-        
+
     Returns:
         Encoded JWT token
     """
@@ -60,13 +60,13 @@ def create_access_token(data: dict[str, Any]) -> str:
 def decode_access_token(token: str) -> dict[str, Any]:
     """
     Decode and validate JWT token
-    
+
     Args:
         token: JWT token
-        
+
     Returns:
         Decoded token payload
-        
+
     Raises:
         HTTPException: If token is invalid
     """
@@ -85,19 +85,19 @@ def decode_access_token(token: str) -> dict[str, Any]:
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict[str, Any]:
     """
     Get current authenticated user from JWT token
-    
+
     Args:
         credentials: HTTP authorization credentials
-        
+
     Returns:
         User data
-        
+
     Raises:
         HTTPException: If user not found or token invalid
     """
     token = credentials.credentials
     payload = decode_access_token(token)
-    
+
     user_id = payload.get("user_id")
     if user_id is None:
         raise HTTPException(
@@ -105,36 +105,36 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     query = """
-        SELECT 
+        SELECT
             id, email, password_hash, full_name,
             is_admin, is_active, created_at, updated_at
         FROM users
         WHERE id = $1 AND is_active = TRUE
     """
     user = await fetch_one(query, user_id)
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     return user
 
 
 async def get_current_active_user(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     """
     Get current active user
-    
+
     Args:
         current_user: Current user from token
-        
+
     Returns:
         User data
-        
+
     Raises:
         HTTPException: If user is inactive
     """
@@ -146,13 +146,13 @@ async def get_current_active_user(current_user: dict[str, Any] = Depends(get_cur
 async def get_current_admin_user(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     """
     Get current admin user
-    
+
     Args:
         current_user: Current user from token
-        
+
     Returns:
         User data
-        
+
     Raises:
         HTTPException: If user is not admin
     """
@@ -162,4 +162,3 @@ async def get_current_admin_user(current_user: dict[str, Any] = Depends(get_curr
             detail="Not enough privileges"
         )
     return current_user
-

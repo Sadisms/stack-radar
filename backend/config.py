@@ -15,7 +15,7 @@ class DatabaseConfig:
     database: str
     min_pool_size: int = 5
     max_pool_size: int = 20
-    
+
     @property
     def dsn(self) -> str:
         return f"postgresql://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}"
@@ -76,4 +76,3 @@ def get_settings() -> Settings:
             allowed_origins=os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(","),
         ),
     )
-

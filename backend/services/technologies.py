@@ -50,7 +50,7 @@ class TechnologyService:
     @staticmethod
     async def get_stats() -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
         query = """
-            SELECT 
+            SELECT
                 t.id,
                 t.name,
                 ts.name as status,
@@ -70,7 +70,7 @@ class TechnologyService:
         items = await fetch_all(query)
 
         total_query = """
-            SELECT 
+            SELECT
                 COUNT(DISTINCT t.id) as total_technologies,
                 COUNT(DISTINCT p.id) as total_projects,
                 COUNT(DISTINCT pt.id) as total_usages,
@@ -81,7 +81,7 @@ class TechnologyService:
             CROSS JOIN technology_categories tc
         """
         total_stats = await fetch_one(total_query)
-        
+
         return items, total_stats
 
     @staticmethod
@@ -105,7 +105,7 @@ class TechnologyService:
         params: list[Any],
     ) -> list[dict[str, Any]]:
         data_query = f"""
-            SELECT 
+            SELECT
                 t.id, t.name, t.category_id, t.description, t.official_website,
                 ts.name as status, t.created_at, t.updated_at
             FROM technologies t
@@ -120,11 +120,11 @@ class TechnologyService:
     async def create_technology(tech: TechnologyCreate, status_id: int) -> dict[str, Any]:
         insert_query = """
             INSERT INTO technologies (
-                name, category_id, description, official_website, 
+                name, category_id, description, official_website,
                 status_id, created_at, updated_at
             )
             VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-            RETURNING id, name, category_id, description, official_website, 
+            RETURNING id, name, category_id, description, official_website,
                       status_id, created_at, updated_at
         """
         result = await fetch_one(
@@ -140,7 +140,7 @@ class TechnologyService:
     @staticmethod
     async def get_technology_by_id(tech_id: int) -> dict[str, Any] | None:
         query = """
-            SELECT 
+            SELECT
                 t.id, t.name, t.category_id, t.description, t.official_website,
                 ts.name as status, t.created_at, t.updated_at
             FROM technologies t
@@ -160,7 +160,7 @@ class TechnologyService:
             SET name = $1, category_id = $2, description = $3,
                 official_website = $4, status_id = $5, updated_at = NOW()
             WHERE id = $6
-            RETURNING id, name, category_id, description, official_website, 
+            RETURNING id, name, category_id, description, official_website,
                       status_id, created_at, updated_at
         """
         result = await fetch_one(

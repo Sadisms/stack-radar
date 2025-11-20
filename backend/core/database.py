@@ -12,7 +12,7 @@ class Database:
     Database connection pool manager
     """
     _pool: Pool | None = None
-    
+
     @classmethod
     async def connect(cls) -> None:
         """
@@ -29,7 +29,7 @@ class Database:
                 min_size=settings.database.min_pool_size,
                 max_size=settings.database.max_pool_size,
             )
-    
+
     @classmethod
     async def disconnect(cls) -> None:
         """
@@ -38,12 +38,12 @@ class Database:
         if cls._pool is not None:
             await cls._pool.close()
             cls._pool = None
-    
+
     @classmethod
     def get_pool(cls) -> Pool:
         """
         Get database connection pool
-        
+
         Raises:
             RuntimeError: If pool is not initialized
         """
@@ -56,7 +56,7 @@ class Database:
 async def get_db_connection() -> AsyncGenerator[asyncpg.Connection, None]:
     """
     Get database connection from pool
-    
+
     Yields:
         Database connection
     """
@@ -68,11 +68,11 @@ async def get_db_connection() -> AsyncGenerator[asyncpg.Connection, None]:
 async def fetch_one(query: str, *args: Any) -> dict[str, Any] | None:
     """
     Execute query and fetch one row as dictionary
-    
+
     Args:
         query: SQL query
         *args: Query parameters
-        
+
     Returns:
         Row as dictionary or None if not found
     """
@@ -84,11 +84,11 @@ async def fetch_one(query: str, *args: Any) -> dict[str, Any] | None:
 async def fetch_all(query: str, *args: Any) -> list[dict[str, Any]]:
     """
     Execute query and fetch all rows as list of dictionaries
-    
+
     Args:
         query: SQL query
         *args: Query parameters
-        
+
     Returns:
         List of rows as dictionaries
     """
@@ -100,11 +100,11 @@ async def fetch_all(query: str, *args: Any) -> list[dict[str, Any]]:
 async def fetch_val(query: str, *args: Any) -> Any:
     """
     Execute query and fetch single value
-    
+
     Args:
         query: SQL query
         *args: Query parameters
-        
+
     Returns:
         Single value
     """
@@ -115,14 +115,13 @@ async def fetch_val(query: str, *args: Any) -> Any:
 async def execute(query: str, *args: Any) -> str:
     """
     Execute query without returning results
-    
+
     Args:
         query: SQL query
         *args: Query parameters
-        
+
     Returns:
         Status message
     """
     async with get_db_connection() as conn:
         return await conn.execute(query, *args)
-

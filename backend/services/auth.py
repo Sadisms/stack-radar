@@ -1,14 +1,13 @@
 from typing import Any
 
 from backend.core.database import fetch_all, fetch_one
-from backend.core.pagination import PaginationParams, SortParams
 
 
 class AuthService:
     @staticmethod
     async def get_user_by_email(email: str) -> dict[str, Any] | None:
         query = """
-            SELECT 
+            SELECT
                 id, email, password_hash, full_name,
                 is_admin, is_active, created_at, updated_at
             FROM users
@@ -19,7 +18,7 @@ class AuthService:
     @staticmethod
     async def get_user_by_id(user_id: int) -> dict[str, Any] | None:
         query = """
-            SELECT 
+            SELECT
                 id, email, full_name, is_admin, is_active,
                 created_at, updated_at
             FROM users
@@ -47,7 +46,7 @@ class AuthService:
         params: list[Any],
     ) -> list[dict[str, Any]]:
         data_query = f"""
-            SELECT 
+            SELECT
                 u.id,
                 u.email,
                 u.full_name,
@@ -87,7 +86,7 @@ class AuthService:
         is_active: bool
     ) -> dict[str, Any] | None:
         query = """
-            UPDATE users 
+            UPDATE users
             SET email = $1, full_name = $2, is_admin = $3, is_active = $4, updated_at = NOW()
             WHERE id = $5
             RETURNING id, email, full_name, is_admin, is_active, created_at, updated_at

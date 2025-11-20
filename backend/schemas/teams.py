@@ -26,4 +26,3 @@ class Team(TeamBase):
     id: int
     created_at: datetime
     updated_at: datetime
-

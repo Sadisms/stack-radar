@@ -79,5 +79,3 @@ class UpdatePasswordRequest(BaseModel):
     Update password request model
     """
     password: str
-
-

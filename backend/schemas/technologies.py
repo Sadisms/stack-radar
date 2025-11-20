@@ -81,4 +81,3 @@ class TechnologyStatsResponse(BaseModel):
     """
     technologies: list[TechnologyStats]
     summary: dict
-

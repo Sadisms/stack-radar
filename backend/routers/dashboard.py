@@ -9,10 +9,10 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 async def get_dashboard_stats(current_user: dict = Depends(get_current_active_user)):
     """
     Get all dashboard statistics
-    
+
     Args:
         current_user: Current authenticated user
-        
+
     Returns:
         Dashboard statistics including:
         - Overview: total counts
@@ -28,7 +28,7 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_active_us
     recent_projects = await DashboardService.get_recent_projects()
     team_summary = await DashboardService.get_team_summary()
     tech_by_category = await DashboardService.get_technology_by_category()
-    
+
     return {
         "overview": overview,
         "technology_usage": tech_usage,

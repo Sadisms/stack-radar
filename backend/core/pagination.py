@@ -1,5 +1,5 @@
 from math import ceil
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from fastapi import Query
 from pydantic import BaseModel
@@ -55,18 +55,18 @@ def paginate(
 ) -> PaginatedResponse[T]:
     """
     Create paginated response
-    
+
     Args:
         items: List of items
         total: Total number of items
         pagination: Pagination parameters
         sort_params: Sort parameters
-        
+
     Returns:
         Paginated response
     """
     total_pages = ceil(total / pagination.page_size) if pagination.page_size > 0 else 0
-    
+
     return PaginatedResponse(
         items=items,
         page=pagination.page,
@@ -76,4 +76,3 @@ def paginate(
         sort_by=sort_params.sort_by,
         sort_order=sort_params.sort_order,
     )
-

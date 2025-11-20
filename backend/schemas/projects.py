@@ -35,7 +35,6 @@ class ProjectUpdate(BaseModel):
     technology_ids: list[int] | None = None
 
 
-
 class Project(ProjectBase):
     """
     Project response model
@@ -87,4 +86,3 @@ class ProjectTechnologyWithDetails(BaseModel):
     added_at: datetime
     category_name: str
     status: str
-

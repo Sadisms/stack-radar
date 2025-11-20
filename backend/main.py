@@ -13,7 +13,7 @@ from backend.routers import auth, projects, teams, technologies, dashboard, admi
 async def lifespan(_: FastAPI):
     """
     Application lifespan manager
-    
+
     Handles startup and shutdown events
     """
     await Database.connect()
@@ -24,12 +24,12 @@ async def lifespan(_: FastAPI):
 def create_app() -> FastAPI:
     """
     Create and configure FastAPI application
-    
+
     Returns:
         Configured FastAPI instance
     """
     settings = get_settings()
-    
+
     app = FastAPI(
         title="Stack Radar API",
         description="Modern API for technology stack tracking",
@@ -39,7 +39,7 @@ def create_app() -> FastAPI:
         openapi_url="/api/openapi.json",
         lifespan=lifespan,
     )
-    
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.app.allowed_origins,
@@ -47,33 +47,33 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    
+
     app.add_exception_handler(APIException, api_exception_handler)
     app.add_exception_handler(Exception, general_exception_handler)
-    
+
     api_prefix = settings.app.api_v1_prefix
-    
+
     app.include_router(auth.router, prefix=api_prefix)
     app.include_router(technologies.router, prefix=f"{api_prefix}")
     app.include_router(projects.router, prefix=f"{api_prefix}")
     app.include_router(teams.router, prefix=f"{api_prefix}")
     app.include_router(dashboard.router, prefix=f"{api_prefix}")
     app.include_router(admin.router, prefix=f"{api_prefix}")
-    
+
     @app.get("/")
     async def root():
         """
         Root endpoint
         """
         return {"message": "Stack Radar API", "version": "1.0.0"}
-    
+
     @app.get("/health")
     async def health():
         """
         Health check endpoint
         """
         return {"status": "healthy"}
-    
+
     return app
 
 

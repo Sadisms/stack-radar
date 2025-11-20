@@ -21,7 +21,7 @@ class ProjectService:
         params: list[Any],
     ) -> list[dict[str, Any]]:
         data_query = f"""
-            SELECT 
+            SELECT
                 p.id, p.name, p.description, p.team_id, p.status,
                 p.repository_url, p.start_date, p.created_at, p.updated_at
             FROM projects p
@@ -30,15 +30,15 @@ class ProjectService:
             LIMIT ${len(params) + 1} OFFSET ${len(params) + 2}
         """
         projects = await fetch_all(data_query, *params, limit, offset)
-        
+
         if not projects:
             return []
-            
+
         project_ids = [p["id"] for p in projects]
-        
+
         # Fetch technologies for these projects
         tech_query = """
-            SELECT 
+            SELECT
                 pt.id, pt.project_id, pt.technology_id,
                 t.name as technology_name,
                 pt.version_id,
@@ -55,7 +55,7 @@ class ProjectService:
             ORDER BY t.name ASC
         """
         technologies = await fetch_all(tech_query, project_ids)
-        
+
         # Group technologies by project_id
         tech_map = {}
         for tech in technologies:
@@ -63,21 +63,21 @@ class ProjectService:
             if pid not in tech_map:
                 tech_map[pid] = []
             tech_map[pid].append(dict(tech))
-            
+
         # Attach to projects
         results = []
         for p in projects:
             p_dict = dict(p)
             p_dict["technologies"] = tech_map.get(p["id"], [])
             results.append(p_dict)
-            
+
         return results
 
     @staticmethod
     async def get_project_by_id(project_id: int) -> dict[str, Any] | None:
         query = """
-            SELECT 
-                id, name, description, team_id, status, repository_url, 
+            SELECT
+                id, name, description, team_id, status, repository_url,
                 start_date, created_at, updated_at
             FROM projects
             WHERE id = $1
@@ -92,11 +92,11 @@ class ProjectService:
     async def create_project(project: ProjectCreate) -> dict[str, Any]:
         insert_query = """
             INSERT INTO projects (
-                name, description, team_id, status, repository_url, 
+                name, description, team_id, status, repository_url,
                 start_date, created_at, updated_at
             )
             VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-            RETURNING id, name, description, team_id, status, repository_url, 
+            RETURNING id, name, description, team_id, status, repository_url,
                 start_date, created_at, updated_at
         """
         result = await fetch_one(
@@ -108,7 +108,7 @@ class ProjectService:
             project.repository_url,
             project.start_date,
         )
-        
+
         if result and project.technology_ids:
             project_id = result["id"]
             for tech_id in project.technology_ids:
@@ -121,11 +121,11 @@ class ProjectService:
                     project_id,
                     tech_id
                 )
-            
+
             # Fetch technologies to return with project
             result = dict(result)
             result["technologies"] = await ProjectService.get_project_technologies(project_id)
-            
+
         return dict(result) if result else {}
 
     @staticmethod
@@ -133,56 +133,56 @@ class ProjectService:
         update_fields = []
         params = []
         param_count = 0
-        
+
         if project.name is not None:
             param_count += 1
             update_fields.append(f"name = ${param_count}")
             params.append(project.name)
-            
+
         if project.description is not None:
             param_count += 1
             update_fields.append(f"description = ${param_count}")
             params.append(project.description)
-            
+
         if project.team_id is not None:
             param_count += 1
             update_fields.append(f"team_id = ${param_count}")
             params.append(project.team_id)
-            
+
         if project.status is not None:
             param_count += 1
             update_fields.append(f"status = ${param_count}")
             params.append(project.status)
-            
+
         if project.repository_url is not None:
             param_count += 1
             update_fields.append(f"repository_url = ${param_count}")
             params.append(project.repository_url)
-            
+
         if project.start_date is not None:
             param_count += 1
             update_fields.append(f"start_date = ${param_count}")
             params.append(project.start_date)
-            
+
         if update_fields:
             param_count += 1
             query = f"""
-                UPDATE projects 
+                UPDATE projects
                 SET {", ".join(update_fields)}, updated_at = NOW()
                 WHERE id = ${param_count}
                 RETURNING id
             """
             params.append(project_id)
             await fetch_one(query, *params)
-            
+
         if project.technology_ids is not None:
             current_techs = await ProjectService.get_project_technologies(project_id)
             current_ids = set(t["technology_id"] for t in current_techs)
             new_ids = set(project.technology_ids)
-            
+
             to_add = new_ids - current_ids
             to_remove = current_ids - new_ids
-            
+
             # Remove
             if to_remove:
                 await execute(
@@ -190,7 +190,7 @@ class ProjectService:
                     project_id,
                     list(to_remove)
                 )
-                
+
             # Add
             for tech_id in to_add:
                 await execute(
@@ -202,7 +202,7 @@ class ProjectService:
                     project_id,
                     tech_id
                 )
-                
+
         return await ProjectService.get_project_by_id(project_id)
 
     @staticmethod
@@ -212,7 +212,7 @@ class ProjectService:
     @staticmethod
     async def get_project_technologies(project_id: int) -> list[dict[str, Any]]:
         query = """
-            SELECT 
+            SELECT
                 pt.id, pt.project_id, pt.technology_id,
                 t.name as technology_name,
                 pt.version_id,
@@ -275,12 +275,12 @@ class ProjectService:
     async def execute_archiving(inactive_days: int, user_id: int) -> list[dict[str, Any]]:
         query = "SELECT * FROM archive_inactive_projects($1, false)"
         results = await fetch_all(query, inactive_days)
-        
+
         await execute(
             "UPDATE archive_log SET archived_by = $1 WHERE id = (SELECT MAX(id) FROM archive_log)",
             user_id
         )
-        
+
         return [dict(r) for r in results]
 
     @staticmethod
@@ -288,4 +288,3 @@ class ProjectService:
         query = "SELECT * FROM get_archive_history($1)"
         results = await fetch_all(query, limit)
         return [dict(r) for r in results]
-

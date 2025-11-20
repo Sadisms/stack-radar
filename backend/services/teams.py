@@ -21,7 +21,7 @@ class TeamService:
         params: list[Any],
     ) -> list[dict[str, Any]]:
         data_query = f"""
-            SELECT 
+            SELECT
                 t.id, t.name, t.description, t.lead_id,
                 t.created_at, t.updated_at
             FROM teams t
@@ -53,16 +53,16 @@ class TeamService:
     @staticmethod
     async def update_team(team_id: int, team: TeamCreate) -> dict[str, Any] | None:
         update_query = """
-            UPDATE teams 
+            UPDATE teams
             SET name = $1, description = $2, lead_id = $3, updated_at = NOW()
             WHERE id = $4
             RETURNING id, name, description, lead_id, created_at, updated_at
         """
         result = await fetch_one(
-            update_query, 
-            team.name, 
-            team.description, 
-            team.lead_id, 
+            update_query,
+            team.name,
+            team.description,
+            team.lead_id,
             team_id
         )
         return dict(result) if result else None

@@ -19,11 +19,11 @@ async def preview_archive(
 ):
     """
     Preview projects that would be archived
-    
+
     Args:
         inactive_days: Number of days of inactivity threshold
         admin_user: Current admin user (from dependency)
-        
+
     Returns:
         Count and list of projects that would be archived
     """
@@ -42,11 +42,11 @@ async def execute_archive(
 ):
     """
     Execute archiving of inactive projects
-    
+
     Args:
         inactive_days: Number of days of inactivity threshold
         admin_user: Current admin user (from dependency)
-        
+
     Returns:
         Success status and list of archived projects
     """
@@ -65,11 +65,11 @@ async def archive_history(
 ):
     """
     Get archive operation history
-    
+
     Args:
         limit: Maximum number of history entries to return
         admin_user: Current admin user (from dependency)
-        
+
     Returns:
         List of recent archiving operations
     """
