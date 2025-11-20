@@ -34,7 +34,10 @@ export default function AppLayout() {
 		<SidebarProvider>
 			<Sidebar className="bg-neutral-950 border-neutral-800">
 				<SidebarHeader className="px-4 py-3">
-					<div className="text-neutral-100 font-semibold">Stack Radar</div>
+					<div className="flex items-center gap-2 text-neutral-100 font-semibold">
+						<img src="/logo.svg" alt="Stack Radar" className="h-6 w-6 rounded-md" />
+						Stack Radar
+					</div>
 				</SidebarHeader>
 				<SidebarContent>
 					<SidebarGroup>
