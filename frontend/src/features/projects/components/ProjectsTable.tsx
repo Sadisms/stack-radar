@@ -67,6 +67,7 @@ export function ProjectsTable({
                                     <SortIcon field="team_id" />
                                 </div>
                             </TableHead>
+                            <TableHead className="text-neutral-400">Технологии</TableHead>
                             <TableHead
                                 className="text-neutral-400 cursor-pointer hover:text-neutral-200 transition-colors"
                                 onClick={() => onSort("status")}
@@ -92,13 +93,13 @@ export function ProjectsTable({
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center text-neutral-500">
+                                <TableCell colSpan={7} className="h-24 text-center text-neutral-500">
                                     Загрузка...
                                 </TableCell>
                             </TableRow>
                         ) : items.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center text-neutral-500">
+                                <TableCell colSpan={7} className="h-24 text-center text-neutral-500">
                                     Проекты не найдены
                                 </TableCell>
                             </TableRow>
@@ -114,6 +115,20 @@ export function ProjectsTable({
                                             )}
                                         </TableCell>
                                         <TableCell className="text-neutral-300">{teamName}</TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-wrap gap-1">
+                                                {p.technologies?.slice(0, 3).map(t => (
+                                                    <Badge key={t.id} variant="outline" className="text-xs border-neutral-700 text-neutral-400">
+                                                        {t.technology_name}
+                                                    </Badge>
+                                                ))}
+                                                {p.technologies && p.technologies.length > 3 && (
+                                                    <Badge variant="outline" className="text-xs border-neutral-700 text-neutral-400">
+                                                        +{p.technologies.length - 3}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </TableCell>
                                         <TableCell>
                                             <Badge variant={getStatusColor(p.status) as any}>
                                                 {p.status}

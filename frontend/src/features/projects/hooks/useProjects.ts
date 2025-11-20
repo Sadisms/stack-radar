@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { api } from "@/api/client";
-import type { Project, Team } from "@/api/client";
+import type { Project, Team, Technology } from "@/api/client";
 
 const projectSchema = z.object({
     name: z.string().min(1, "Название обязательно"),
@@ -11,7 +11,8 @@ const projectSchema = z.object({
     team_id: z.number().nullable().optional(),
     status: z.string().min(1, "Статус обязателен"),
     repository_url: z.string().url("Некорректный URL").optional().or(z.literal("")),
-    start_date: z.string().optional().nullable()
+    start_date: z.string().optional().nullable(),
+    technology_ids: z.array(z.number())
 });
 
 type ProjectFormValues = z.infer<typeof projectSchema>;
@@ -19,6 +20,7 @@ type ProjectFormValues = z.infer<typeof projectSchema>;
 export function useProjects() {
     const [items, setItems] = useState<Project[]>([]);
     const [teams, setTeams] = useState<Team[]>([]);
+    const [technologies, setTechnologies] = useState<Technology[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
@@ -44,12 +46,14 @@ export function useProjects() {
             team_id: null,
             status: "active",
             repository_url: "",
-            start_date: null
+            start_date: null,
+            technology_ids: []
         }
     });
 
     useEffect(() => {
         api.listTeams().then((resp) => setTeams(resp.items ?? [])).catch(() => { });
+        api.listTechnologies({ page_size: 100 }).then((resp) => setTechnologies(resp.items ?? [])).catch(() => { });
     }, []);
 
     const load = async () => {
@@ -93,7 +97,8 @@ export function useProjects() {
             team_id: teams[0]?.id || null,
             status: "active",
             repository_url: "",
-            start_date: null
+            start_date: null,
+            technology_ids: []
         });
         setCreateOpen(true);
     };
@@ -105,8 +110,9 @@ export function useProjects() {
             team_id: values.team_id ?? null,
             status: values.status,
             repository_url: values.repository_url ?? "",
-            start_date: values.start_date || null
-        });
+            start_date: values.start_date || null,
+            technology_ids: values.technology_ids
+        } as any);
         setCreateOpen(false);
         await load();
     };
@@ -119,47 +125,26 @@ export function useProjects() {
             team_id: project.team_id,
             status: project.status,
             repository_url: project.repository_url,
-            start_date: project.start_date
+            start_date: project.start_date,
+            technology_ids: project.technologies?.map(t => t.technology_id) || []
         });
         setEditOpen(true);
     };
 
-    const onSubmitEdit = async (_values: ProjectFormValues) => {
-        // Note: Update endpoint not explicitly defined in client.ts but usually follows pattern.
-        // Checking client.ts... createProject is there. updateProject is NOT in client.ts!
-        // Wait, I need to check client.ts again.
-        // I viewed client.ts earlier. It has `createProject`, `getProject`, `deleteProject`.
-        // IT DOES NOT HAVE `updateProject`.
-        // I must add `updateProject` to client.ts first or handle it.
-        // Let's assume I will add it.
-        // For now I will comment out the update call or implement it if I can.
-        // Actually, I should check backend if update endpoint exists.
-        // Backend `projects.py` has: list, create, get, delete. NO PUT/PATCH.
-        // So I CANNOT update projects yet.
-        // I will disable editing for now or just implement create/delete.
-        // Or I can add the endpoint to backend.
-        // The user asked to "realize by the same principle". The Technologies page has editing.
-        // If backend doesn't support it, I should probably add it or skip it.
-        // Given the instructions "Refactor DB Operations to Services" was the previous task, maybe I should stick to existing endpoints.
-        // But "Technologies" page has editing.
-        // I'll check backend `projects.py` again.
-
-        // Checking `projects.py` content from previous turn...
-        // @router.get("") list
-        // @router.post("") create
-        // @router.get("/{id}") get
-        // @router.delete("/{id}") delete
-        // @router.get("/{id}/technologies")
-        // @router.post("/{id}/technologies")
-        // @router.delete("/{id}/technologies/{tech_id}")
-
-        // There is NO update endpoint.
-        // I will implement the hook without update logic for now, or show an error/alert that it's not implemented.
-        // Or better, I will just not include the Edit button in the table or make it do nothing/show toast.
-        // But I already added Edit button in Table.
-        // I will leave the `onSubmitEdit` empty or log "Not implemented".
-        console.warn("Update project not implemented in backend");
+    const onSubmitEdit = async (values: ProjectFormValues) => {
+        if (!editing) return;
+        await api.updateProject(editing.id, {
+            name: values.name,
+            description: values.description ?? "",
+            team_id: values.team_id ?? null,
+            status: values.status,
+            repository_url: values.repository_url ?? "",
+            start_date: values.start_date || null,
+            technology_ids: values.technology_ids
+        });
         setEditOpen(false);
+        setEditing(null);
+        await load();
     };
 
     const onConfirmDelete = async () => {
@@ -172,7 +157,7 @@ export function useProjects() {
     const pageSizes = useMemo(() => [10, 20, 50], []);
 
     return {
-        items, teams,
+        items, teams, technologies,
         page, setPage, pageSize, setPageSize, totalPages, total,
         q, setQ, statusFilter, setStatusFilter, teamFilter, setTeamFilter,
         sortBy, sortOrder, onSort,

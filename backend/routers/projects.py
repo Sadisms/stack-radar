@@ -8,6 +8,7 @@ from backend.services.technologies import TechnologyService
 from backend.schemas.projects import (
     Project,
     ProjectCreate,
+    ProjectUpdate,
     ProjectTechnology,
     ProjectTechnologyCreate,
     ProjectTechnologyWithDetails,
@@ -130,6 +131,35 @@ async def get_project(project_id: int):
     
     if not result:
         raise NotFoundException(f"Проект с id={project_id} не найден")
+    
+    return Project(**result)
+
+
+@router.put("/{project_id}", response_model=Project)
+async def update_project(project_id: int, project: ProjectUpdate):
+    """
+    Update project
+    
+    Args:
+        project_id: Project ID
+        project: Project update data
+        
+    Returns:
+        Updated project
+        
+    Raises:
+        NotFoundException: If project not found
+    """
+    check = await ProjectService.get_project_by_id(project_id)
+    if not check:
+        raise NotFoundException(f"Проект с id={project_id} не найден")
+        
+    if project.team_id:
+        team_check = await TeamService.get_team_by_id(project.team_id)
+        if not team_check:
+            raise NotFoundException(f"Команда с id={project.team_id} не найдена")
+            
+    result = await ProjectService.update_project(project_id, project)
     
     return Project(**result)
 

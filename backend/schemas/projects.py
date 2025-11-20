@@ -19,7 +19,21 @@ class ProjectCreate(ProjectBase):
     """
     Project creation model
     """
-    pass
+    technology_ids: list[int] = []
+
+
+class ProjectUpdate(BaseModel):
+    """
+    Project update model
+    """
+    name: str | None = None
+    description: str | None = None
+    team_id: int | None = None
+    status: str | None = None
+    repository_url: str | None = None
+    start_date: date | None = None
+    technology_ids: list[int] | None = None
+
 
 
 class Project(ProjectBase):
@@ -29,6 +43,7 @@ class Project(ProjectBase):
     id: int
     created_at: datetime
     updated_at: datetime
+    technologies: list["ProjectTechnologyWithDetails"] = []
 
 
 class ProjectTechnologyBase(BaseModel):

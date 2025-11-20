@@ -9,7 +9,7 @@ import { ProjectDialogs } from "@/features/projects/components/ProjectDialogs";
 
 export default function ProjectsPage() {
     const {
-        items, teams,
+        items, teams, technologies,
         page, setPage, pageSize, setPageSize, totalPages, total,
         q, setQ, statusFilter, setStatusFilter, teamFilter, setTeamFilter,
         sortBy, sortOrder, onSort,
@@ -80,6 +80,7 @@ export default function ProjectsPage() {
                     onSubmitEdit={onSubmitEdit}
                     onConfirmDelete={onConfirmDelete}
                     teams={teams}
+                    technologies={technologies}
                 />
             </div>
         </div>

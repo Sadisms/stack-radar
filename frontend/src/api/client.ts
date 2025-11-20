@@ -62,25 +62,43 @@ export type CreateTechnologyRequest = {
 
 export type UpdateTechnologyRequest = CreateTechnologyRequest;
 
-export type Project = {
+export type UpdateProjectRequest = Partial<CreateProjectRequest>;
+
+export interface ProjectTechnologyWithDetails {
+	id: number;
+	project_id: number;
+	technology_id: number;
+	technology_name: string;
+	version_id?: number | null;
+	version_number?: string | null;
+	usage_type: string;
+	notes?: string | null;
+	added_at: string;
+	category_name: string;
+	status: string;
+}
+
+export interface Project {
 	id: number;
 	name: string;
-	description: string;
-	team_id: number | null;
+	description?: string;
+	team_id?: number | null;
 	status: string;
-	repository_url: string;
-	start_date: string | null;
+	repository_url?: string;
+	start_date?: string | null;
 	created_at: string;
 	updated_at: string;
+	technologies?: ProjectTechnologyWithDetails[];
 };
 
 export type CreateProjectRequest = {
 	name: string;
-	description: string;
-	team_id: number | null;
+	description?: string;
+	team_id?: number | null;
 	status: string;
-	repository_url: string;
-	start_date: string | null;
+	repository_url?: string;
+	start_date?: string | null;
+	technology_ids?: number[];
 };
 
 export type Team = {
@@ -373,6 +391,9 @@ export const api = {
 	},
 	createProject(payload: CreateProjectRequest): Promise<Project> {
 		return request<Project>("/projects", { method: "POST", body: payload });
+	},
+	updateProject(id: number, payload: UpdateProjectRequest): Promise<Project> {
+		return request<Project>(`/projects/${id}`, { method: "PUT", body: payload });
 	},
 	getProject(id: number): Promise<Project> {
 		return request<Project>(`/projects/${id}`);

@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ProjectForm } from "./ProjectForm";
 import type { UseFormReturn } from "react-hook-form";
-import type { Team } from "@/api/client";
+import type { Team, Technology } from "@/api/client";
 
 interface ProjectDialogsProps {
     createOpen: boolean;
@@ -16,6 +16,7 @@ interface ProjectDialogsProps {
     onSubmitEdit: (values: any) => void;
     onConfirmDelete: () => void;
     teams: Team[];
+    technologies: Technology[];
 }
 
 export function ProjectDialogs({
@@ -23,7 +24,7 @@ export function ProjectDialogs({
     editOpen, setEditOpen,
     deleteId, setDeleteId,
     form, onSubmitCreate, onSubmitEdit, onConfirmDelete,
-    teams
+    teams, technologies
 }: ProjectDialogsProps) {
     return (
         <>
@@ -40,6 +41,7 @@ export function ProjectDialogs({
                         form={form}
                         onSubmit={onSubmitCreate}
                         teams={teams}
+                        technologies={technologies}
                         onCancel={() => setCreateOpen(false)}
                         submitLabel="Создать"
                     />
@@ -59,6 +61,7 @@ export function ProjectDialogs({
                         form={form}
                         onSubmit={onSubmitEdit}
                         teams={teams}
+                        technologies={technologies}
                         onCancel={() => setEditOpen(false)}
                         submitLabel="Сохранить"
                     />
