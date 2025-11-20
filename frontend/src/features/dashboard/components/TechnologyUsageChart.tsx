@@ -38,6 +38,7 @@ export function TechnologyUsageChart({ data }: TechnologyUsageChartProps) {
                                 borderRadius: '6px',
                                 color: '#e5e5e5'
                             }}
+                            itemStyle={{ color: '#e5e5e5' }}
                             cursor={{ fill: '#262626' }}
                         />
                         <Bar dataKey="project_count" name="Проектов">

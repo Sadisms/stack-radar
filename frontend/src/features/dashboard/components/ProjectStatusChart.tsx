@@ -55,6 +55,7 @@ export function ProjectStatusChart({ data }: ProjectStatusChartProps) {
                                 borderRadius: '6px',
                                 color: '#e5e5e5'
                             }}
+                            itemStyle={{ color: '#e5e5e5' }}
                         />
                         <Legend
                             wrapperStyle={{ color: '#a3a3a3' }}
